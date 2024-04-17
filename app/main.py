@@ -1,15 +1,26 @@
-from typing import Union
-
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from .database import engine
+from . import models
+from .routers import(
+    auth_routers, 
+    user_routers 
+) 
+
+models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
+origins = ["*"]
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+app.include_router(user_routers.user_router)
+app.include_router(auth_routers.auth_router)
