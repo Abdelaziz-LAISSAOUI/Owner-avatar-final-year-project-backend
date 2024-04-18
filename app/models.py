@@ -83,7 +83,7 @@ class Quesion(Base):
     option1 = Column(String, nullable=False)
     option2 = Column(String, nullable=False)
     option3 = Column(String, nullable=False)
-
+    lesson_name = Column(String, ForeignKey("lessons.lesson_name"))
 
 
 
