@@ -22,7 +22,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES =os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-auth_router = APIRouter()
+auth_router = APIRouter(tags=["authentification"])
 
 @auth_router.post("/token")
 async def login_for_access_token(
