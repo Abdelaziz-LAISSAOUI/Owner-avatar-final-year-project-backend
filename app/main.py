@@ -4,7 +4,8 @@ from .database import engine
 from . import models
 from .routers import(
     auth_routers, 
-    user_routers 
+    user_routers, 
+    google_auth 
 ) 
 
 models.Base.metadata.create_all(bind=engine)
@@ -24,3 +25,4 @@ app.add_middleware(
 
 app.include_router(user_routers.user_router)
 app.include_router(auth_routers.auth_router)
+app.include_router(google_auth.google_auth)

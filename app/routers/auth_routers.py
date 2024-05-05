@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from pydantic import BaseModel
 from dotenv import load_dotenv
 from ..crud.user_crud import authenticate_user
 from ..utilities import  create_access_token
