@@ -21,7 +21,7 @@ class User(Base):
     __tablename__='users'
 
     id= Column(UUID, primary_key=True, index=True, default=uuid.uuid4)
-    email= Column(String(256), unique=True, index=True, nullable=False)
+    email= Column(String(256), unique=True, index=True, nullable=False) # make it 320 
     password= Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     completed_test = Column(Boolean, default=False)
