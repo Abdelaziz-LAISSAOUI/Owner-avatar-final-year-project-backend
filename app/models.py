@@ -9,11 +9,7 @@ from sqlalchemy import(
     UniqueConstraint, 
     func 
 )
-
-from fastapi import Depends
-from sqlalchemy.orm import Session
-from sqlalchemy.event import listens_for
-from .database import Base, SessionLocal
+from .database import Base
 import uuid
 
 class User(Base):
@@ -94,22 +90,4 @@ class History(Base):
     user_answer=Column(String, nullable=False)
     feedback=Column(String, nullable=False)
     date=Column(DateTime,default=func.now())
-
-# @event.listens_for(Section.__table__, "after_insert")
-# def update_section_count(mapper, connection, target, db: Session = Depends(get_db)):
-
-#     chapter = db.query(Chapter).filter(Chapter.chapter_name == target.chapter_name).first()
-#     if chapter:
-#         chapter.section_count = chapter.sections.count()
-#         db.commit()
-#     db.close()
-
-# @event.listens_for(Lesson.__table__, "after_insert")
-# def update_section_count(mapper, connection, target, db: Session = Depends(get_db)):
-
-#     section = db.query(Section).filter(Section.section_name == target.section_name).first()
-#     if section:
-#         section.section_count = section.sections.count()
-#         db.commit()
-#     db.close()
 
