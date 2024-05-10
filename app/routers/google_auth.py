@@ -10,7 +10,7 @@ import os
 
 load_dotenv()
 
-google_auth = APIRouter()
+google_auth = APIRouter(tags=["Google Oauth"])
 
 
 config = {
