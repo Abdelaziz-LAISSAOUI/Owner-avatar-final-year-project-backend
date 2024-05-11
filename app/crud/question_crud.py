@@ -1,6 +1,7 @@
 from ..schemas import question_schemas
 from ..models import (Question, MCQ, Iaarab, Writing, History)
 from sqlalchemy.orm import Session
+import random
 import uuid
 
 
@@ -37,7 +38,7 @@ def create_writing(db: Session, question: question_schemas.Writing):
     return db_question
 
 
-def get_mcq_not_in_history(db: Session, current_lvl: str, user_id: uuid.UUID, limit:int =10 ):
+def get_questions_not_in_history(db: Session, current_lvl: str, user_id: uuid.UUID, limit:int =10 ):
 
     subquery = db.query(History.question_id).filter(History.user_id == user_id)
     
@@ -47,9 +48,28 @@ def get_mcq_not_in_history(db: Session, current_lvl: str, user_id: uuid.UUID, li
         MCQ.id == Question.id
     ).filter(
         Question.lesson_name == current_lvl, ~Question.id.in_(subquery)
-    ).limit(limit)
+    ).limit(limit) 
  
     res= []
     for q in questions:
-        res.append({"mcq_data":q[0], "question_data":q[1]})
-    return res
+        # place answer randomly in options 
+        options=['', '', '', '']
+        options[random.randrange(4)]= q[0].answer
+        restOptions=[q[0].option1, q[0].option2, q[0].option3]
+        temp=0
+
+        for i in range(len(options)):
+            if options[i] == '':
+                options[i] = restOptions[temp]
+                temp +=1 
+
+        # res.append({"mcq_data":q[0], "question_data":q[1]})
+        res.append({
+            "id":q[0].id, 
+            "options":options,
+            "body":q[1].body, 
+            "lesson_name":q[1].lesson_name,
+        })
+
+    return {"mcq":res}
+
