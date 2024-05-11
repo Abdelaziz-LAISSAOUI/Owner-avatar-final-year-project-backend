@@ -23,6 +23,15 @@ class MCQ(MCQBase):
 
 class MCQCreate(MCQ):
     pass
+
+class MCQResponse(BaseModel):
+    id : uuid.UUID 
+    body: str
+    lesson_name: str
+    options: list[str]
+
+class QuestionResponse(BaseModel):
+    mcq: list[MCQResponse]
 ################################################
 
 class Iraab(Question):
@@ -31,7 +40,3 @@ class Iraab(Question):
 class Writing(Question):
     pass
 
-################################################
-class CombinedResponse(BaseModel):
-    mcq_data: MCQCreate
-    question_data: Question
