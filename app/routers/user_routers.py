@@ -3,14 +3,20 @@ from jose import JWTError, jwt
 from typing import Annotated
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from ..crud.user_crud import get_user, create_user
-from ..schemas.user_schemas import User, UserCreate
-from ..schemas.token_schemas import TokenData
-from ..crud.user_crud import get_user, get_user_by_email
 from ..database import get_db
-from .auth_routers import oauth2_scheme
 import uuid
 import os 
+
+from ..crud.user_crud import get_user, create_user, get_user, get_user_by_email
+from ..schemas.user_schemas import User, UserCreate
+
+from ..schemas.token_schemas import TokenData
+from .auth_routers import oauth2_scheme
+
+from ..schemas.question_schemas import QuestionResponse, MCQResponse
+
+from ..crud.question_crud import get_questions_not_in_history
+
 
 user_router = APIRouter(
     prefix="/v1/users",
@@ -40,7 +46,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         raise credentials_exception
     user_id = uuid.UUID(token_data.id)
     user = get_user(db, user_id=user_id)
-    print(user.full_name , user.email)
     if user is None:
         raise credentials_exception
     return user
@@ -49,7 +54,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    print(current_user.disabled)
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -71,8 +75,46 @@ async def read_users_me(
     return current_user
 
 
-@user_router.get("/me/items/")
+@user_router.get("/me/questions/", response_model=QuestionResponse)
 async def read_own_items(
-    current_user: Annotated[User, Depends(get_current_active_user)],
+    current_user: Annotated[User, Depends(get_current_active_user)], db: Session =Depends(get_db)
 ):
-    return [{"item_id": "Foo", "owner": current_user.id}]
+    
+    # 1st: get user current lvl & get questions that match this lvl 
+    questions = get_questions_not_in_history(db, current_user.current_lvl, current_user.id)
+
+    # 2rd: question manipulation: 5 mcq, 5 iarrab, 2-3 writing that does not exists in the user History         
+
+    # if not current_user.completed_test:
+    #     # test logic
+    #     return 
+
+    return questions
+
+
+
+"""
+# @user_router.post("/me/questions/", response_model=list[Question], response_model=list[Feedback])
+# async def read_own_items(
+#     current_user: Annotated[User, Depends(get_current_active_user)], answers: Answers
+# ):
+    
+#     # check responses   
+#     # update user history
+#     if not current_user.completed_test:
+#         '''
+#         test logic
+#         '''        
+#         # set user lvl
+#         # (error rate < 80%  ? end assement : continue assement) 
+#         # return feedback
+
+#         return 
+
+#     # analyze user history to decide whether he move to another lesson or practise more
+#     # return feedback 
+
+
+
+#     return current_user
+"""
