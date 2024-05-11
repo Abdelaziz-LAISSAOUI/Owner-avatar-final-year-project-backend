@@ -21,6 +21,7 @@ class User(Base):
     full_name = Column(String, nullable=False)
     completed_test = Column(Boolean, default=False)
     disabled = Column(Boolean, default=True)
+    current_lvl=Column(String, ForeignKey("lessons.lesson_name"), default="lesson 1")
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
@@ -29,19 +30,19 @@ class User(Base):
 class Chapter(Base):
     __tablename__ = "chapters"
 
-    chpater_name=Column(String, index=True, primary_key=True)
+    chapter_name=Column(String, index=True, primary_key=True)
     sections_count=Column(Integer, default=0) 
 
 class Section(Base):
     __tablename__ = "sections"
   
     section_name = Column(String, index=True, primary_key=True)
-    chpater_name = Column(String, ForeignKey("chapters.chpater_name"))
+    chapter_name = Column(String, ForeignKey("chapters.chapter_name"))
     order_in_chapter= Column(Integer)
     lessons_count=Column(Integer, default=0) 
 
     __table_args__ = (
-        UniqueConstraint('chpater_name', 'order_in_chapter', name='_sections_order_uc'),
+        UniqueConstraint('chapter_name', 'order_in_chapter', name='_sections_order_uc'),
     )
 
 class Lesson(Base):
@@ -55,12 +56,16 @@ class Lesson(Base):
         UniqueConstraint('section_name', 'order_in_section', name='_lessons_order_uc'),
     )
 
-class Quesion(Base):
+class Question(Base):
     __tablename__ = "questions"
 
     id= Column(UUID, primary_key=True, default=uuid.uuid4)
-    question= Column(String, nullable=False)
+    body= Column(String, nullable=False)
     lesson_name = Column(String, ForeignKey("lessons.lesson_name"))
+
+
+    def __str__(self):
+        return f"{self.id}  -  {self.body} -  {self.lesson_name}"
 
 
 class MCQ(Base):
@@ -71,6 +76,9 @@ class MCQ(Base):
     option1 = Column(String, nullable=False)
     option2 = Column(String, nullable=False)
     option3 = Column(String, nullable=False)
+
+    def __str__(self):
+        return f"{self.id}  -  {self.answer} -  {self.option1} -  {self.option2} -  {self.option3}  "
 
 class Iaarab(Base):
     __tablename__ = "iaarab_questions"
@@ -91,3 +99,9 @@ class History(Base):
     feedback=Column(String, nullable=False)
     date=Column(DateTime,default=func.now())
 
+class ReportedQuesiton(Base):
+    __tablename__ = "reported_questions"
+
+    user_id =Column(UUID, ForeignKey("users.id"), primary_key=True)
+    question_id= Column(UUID, ForeignKey("questions.id"), primary_key=True)
+    reason=Column(String) 
