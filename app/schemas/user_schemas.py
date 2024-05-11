@@ -17,6 +17,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id : uuid.UUID
     completed_test : bool  
+    current_lvl: str
     disabled : bool 
     created_at : datetime 
     updated_at : datetime  
