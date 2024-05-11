@@ -25,12 +25,15 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
+    def __str__(self):
+        return f"{self.id} | {self.email} | {self.password} | {self.full_name} | {self.completed_test} | {self.disabled} | {self.current_lvl} | {self.created_at} | {self.updated_at}"
 
 
 class Chapter(Base):
     __tablename__ = "chapters"
 
     chapter_name=Column(String, index=True, primary_key=True)
+    order= Column(Integer, nullable=False, unique=True)
     sections_count=Column(Integer, default=0) 
 
 class Section(Base):
@@ -38,7 +41,7 @@ class Section(Base):
   
     section_name = Column(String, index=True, primary_key=True)
     chapter_name = Column(String, ForeignKey("chapters.chapter_name"))
-    order_in_chapter= Column(Integer)
+    order_in_chapter= Column(Integer, nullable=False)
     lessons_count=Column(Integer, default=0) 
 
     __table_args__ = (
@@ -50,11 +53,15 @@ class Lesson(Base):
     
     lesson_name = Column(String, index=True, primary_key=True)
     section_name = Column(String, ForeignKey("sections.section_name"))
-    order_in_section= Column(Integer)
+    order_in_section= Column(Integer, nullable=False)
 
     __table_args__ = (
         UniqueConstraint('section_name', 'order_in_section', name='_lessons_order_uc'),
     )
+
+    def __str__(self):
+        return f"{self.lesson_name} | {self.section_name} | {self.order_in_section} "
+
 
 class Question(Base):
     __tablename__ = "questions"
