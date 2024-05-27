@@ -112,3 +112,15 @@ class ReportedQuesiton(Base):
     user_id =Column(UUID, ForeignKey("users.id"), primary_key=True)
     question_id= Column(UUID, ForeignKey("questions.id"), primary_key=True)
     reason=Column(String) 
+
+class Teacher(Base):
+    __tablename__ = "teachers"
+
+    username = Column(String, primary_key=True)
+    password = Column(String, nullable=False)
+
+class Admin(Base):
+    __tablename__ = "admins"
+
+    username = Column(String, primary_key=True)
+    password = Column(String, nullable=False)
