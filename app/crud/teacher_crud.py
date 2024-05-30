@@ -17,23 +17,21 @@ def get_teachers(db: Session , skip:int= 0, limit:int =10):
 
 def delete_teacher(db: Session, teacher_username: uuid.UUID):
     db_teacher = db.query(Teacher).filter(Teacher.username == teacher_username).first()
-    if db_teacher:
-        db.delete(db_teacher)
-        db.commit()
-        return db_teacher
-    else: 
+    if not db_teacher:
         return None
+    db.delete(db_teacher)
+    db.commit()
+    return db_teacher
     
 def update_teacher(db: Session, teacher_username: uuid.UUID, updated_teacher: TeacherUpdate):
     db_teacher  = db.query(Teacher).filter(Teacher.username == teacher_username).first()
-    if db_teacher:
-        for k, v in updated_teacher.model_dump().items():
-            setattr(db_teacher, k, v)
-        db.commit()
-        db.refresh(db_teacher)
-        return db_teacher
-    else: 
+    if not db_teacher: 
         return None
+    for k, v in updated_teacher.model_dump().items():
+        setattr(db_teacher, k, v)
+    db.commit()
+    db.refresh(db_teacher)
+    return db_teacher
     
 def get_teacher(db: Session, username: str):
     return db.query(Teacher).filter(Teacher.username == username).first()
