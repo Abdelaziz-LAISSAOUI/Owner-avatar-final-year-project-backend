@@ -32,7 +32,6 @@ async def is_admin(req: Request, db: Session = Depends(get_db)):
 
     try:
         token = req.headers["Authorization"].split(" ")[1]
-        print(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id: str = payload.get("sub")
         role: str = payload.get("role")
@@ -41,7 +40,6 @@ async def is_admin(req: Request, db: Session = Depends(get_db)):
     except:
         raise credentials_exception
     
-    print(id)
     admin = get_admin(db, id)
     if admin is None:
         raise credentials_exception

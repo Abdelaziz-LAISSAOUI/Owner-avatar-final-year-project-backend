@@ -1,6 +1,5 @@
 import uuid
 from sqlalchemy.orm import Session
-from app import models
 from ..utilities import verify_password ,get_password_hash
 from ..schemas import user_schemas
 from ..models import User, Lesson, Section, Chapter

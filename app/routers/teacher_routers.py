@@ -31,7 +31,6 @@ async def is_teacher(req: Request, db: Session = Depends(get_db)):
 
     try:
         token = req.headers["Authorization"].split(" ")[1]
-        print(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id: str = payload.get("sub")
         role: str = payload.get("role")
@@ -40,7 +39,6 @@ async def is_teacher(req: Request, db: Session = Depends(get_db)):
     except:
         raise credentials_exception
     
-    print(id)
     teacher = teacher_crud.get_teacher(db, id)
     if teacher is None:
         raise credentials_exception
