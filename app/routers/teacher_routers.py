@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from jose import jwt
 from sqlalchemy.orm import Session
 from app.database import get_db
 from ..schemas import teacher_schemas
 from ..crud import teacher_crud
 from ..routers.admin_routers import is_admin
-import uuid
+import os 
 
 teacher_router = APIRouter(
     prefix="/v1/teachers",
@@ -12,6 +14,37 @@ teacher_router = APIRouter(
 )
 
 
+load_dotenv()
+
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+ALGORITHM = os.environ.get('ALGORITHM')
+
+
+
+async def is_teacher(req: Request, db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        token = req.headers["Authorization"].split(" ")[1]
+        print(token)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        id: str = payload.get("sub")
+        role: str = payload.get("role")
+        if id is None:
+            raise credentials_exception    
+    except:
+        raise credentials_exception
+    
+    print(id)
+    teacher = teacher_crud.get_teacher(db, id)
+    if teacher is None:
+        raise credentials_exception
+    return teacher
 
 
 @teacher_router.post("/", response_model=teacher_schemas.TeacherResponse, status_code=201, responses={401: {"description": "Unauthorized"}})
