@@ -16,6 +16,10 @@ def get_questions(db: Session):
     return db.query(Question).all()
 
 
+def get_question(db: Session, question_id: uuid.UUID):
+    return db.query(Question).filter(Question.id == question_id).first()
+
+
 def create_mcq(db: Session, question: question_schemas.MCQCreate):
     db_question = MCQ(**question.model_dump())
     db.add(db_question)
@@ -73,3 +77,20 @@ def get_questions_not_in_history(db: Session, current_lvl: str, user_id: uuid.UU
 
     return {"mcq":res}
 
+def edit_question(db: Session, question_id: uuid.UUID, question: Question):
+    db_question = get_question(db, question_id)
+    if not db_question:
+        return None
+    for k, v in question: 
+        setattr(db_question, k, v)
+    db.commit()
+    db.refresh(db_question)
+    return db_question
+
+def delete_question(db: Session, question_id: uuid.UUID):
+    db_question = get_question(db, question_id)
+    if not db_question:
+        return None
+    db.delete(db_question)
+    db.commit()
+    return db_question
