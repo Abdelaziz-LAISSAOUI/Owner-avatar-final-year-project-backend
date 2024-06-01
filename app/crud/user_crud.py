@@ -20,6 +20,12 @@ def get_user(db: Session, user_id: uuid.UUID ):
 def get_user_by_email(db: Session, user_email: str):
     return db.query(User).filter(User.email == user_email).first()
 
+def end_initial_assement(db: Session, user_id: uuid.UUID):
+    db_user = get_user(db, user_id)
+    db_user.completed_test = True
+    db.commit()
+    db.refresh(db_user)
+
 # username istead of email just for respecting the OpenAPI specs
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user_by_email(db, user_email=username)
