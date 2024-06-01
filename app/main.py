@@ -8,7 +8,8 @@ from .routers import(
     teacher_routers,  
     user_routers, 
     admin_routers, 
-    reported_question_routers
+    reported_question_routers, 
+    question_routers
 ) 
 
 # from .models import Chapter, Section, Lesson 
@@ -35,3 +36,4 @@ app.include_router(auth_routers.auth_router)
 app.include_router(teacher_routers.teacher_router)
 app.include_router(admin_routers.admin_router)
 app.include_router(reported_question_routers.reported_question_router)
+app.include_router(question_routers.question_router)
