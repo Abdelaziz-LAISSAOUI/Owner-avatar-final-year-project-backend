@@ -86,10 +86,6 @@ def get_questions_not_in_history(db: Session, current_lvl: str, user_id: uuid.UU
         Question.lesson_name == current_lvl, Question.type == "writing", ~Question.id.in_(subquery)
     ).first()
     
-
-    print("iraab", iraab_questions)
-    print("writing", writing_question)
-
     return {"mcq":res, "iraab": iraab_questions, "writing": writing_question}
 
 

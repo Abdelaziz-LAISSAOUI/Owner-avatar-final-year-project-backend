@@ -105,9 +105,6 @@ async def read_own_items(
     # check responses   
     mcq_responses = get_mcq_answers(db, answers.mcq)
     iraab_responses = get_iraab_answers(db, answers.iraab)
-    print("mcq_responses", mcq_responses)
-    print("iraab_response", iraab_responses)
-
     # writing_feedback = get_feedback(answers.writing.user_response)
 
     # update user history
