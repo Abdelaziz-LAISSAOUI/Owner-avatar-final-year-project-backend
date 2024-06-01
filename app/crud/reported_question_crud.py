@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session 
 from ..schemas.reported_question_schemas import ReportBase, ReportResponse
-from ..models import ReportedQuesiton, Question, User
+from ..models import ReportedQuestion, Question, User
 
 
 def create_reported_question(db: Session, question: ReportBase):
-    db_question = ReportedQuesiton(**question.model_dump())
+    db_question = ReportedQuestion(**question.model_dump())
     db.add(db_question)
     db.commit()
     db.refresh(db_question)
@@ -15,8 +15,8 @@ def get_repoted_question_with_users(db: Session, limit:int = 10, skip: int = 0):
     reports = db.query(
          Question, User 
     ).filter(
-        ReportedQuesiton.question_id == Question.id , ReportedQuesiton.user_id == User.id  
-    ).group_by(ReportedQuesiton.question_id, Question.id, User.id).offset(skip).limit(limit).all()
+        ReportedQuestion.question_id == Question.id , ReportedQuestion.user_id == User.id  
+    ).group_by(ReportedQuestion.question_id, Question.id, User.id).offset(skip).limit(limit).all()
 
 
     questions = set([q[0] for q in reports])
