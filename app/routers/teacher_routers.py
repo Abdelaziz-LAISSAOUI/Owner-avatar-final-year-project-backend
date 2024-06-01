@@ -24,8 +24,8 @@ ALGORITHM = os.environ.get('ALGORITHM')
 
 async def is_teacher(req: Request, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You are not allowed to perform this action",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
