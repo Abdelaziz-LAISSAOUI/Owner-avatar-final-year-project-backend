@@ -10,15 +10,17 @@ class ReportCreate(BaseModel):
     question_id: uuid.UUID
     reason: str 
 
-class UserRepost(BaseModel): 
+class UserReport(BaseModel): 
     full_name: str 
-    current_lvl : str
+    lesson_name : str
     reason: str
 
 class ReportResponse(BaseModel):
     question_id: uuid.UUID
     body: str  
     lesson_name: str 
-    users: list[UserRepost]
+    users: list[UserReport]
+    difficulty : str 
+    type : str
     
     
