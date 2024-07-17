@@ -4,6 +4,17 @@ from sqlalchemy.orm import Session
 import random
 import uuid
 
+
+import vertexai
+from vertexai.generative_models import GenerativeModel, Part
+import vertexai.preview.generative_models as generative_models
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+
 def create_question(db: Session, question: question_schemas.QuestionCreate):
     db_question = Question(**question.model_dump())
     db.add(db_question)
@@ -64,7 +75,6 @@ def get_questions_not_in_history(db: Session, current_lvl: str, user_id: uuid.UU
                 options[i] = restOptions[temp]
                 temp +=1 
 
-        # res.append({"mcq_data":q[0], "question_data":q[1]})
         res.append({
             "id":q[0].id, 
             "options":options,
@@ -106,16 +116,7 @@ def edit_question(db: Session, question_id: str, question: question_schemas.Ques
     
 
 
-    print(db_question[0])
-    print(db_question[1])
-
-
     return db_question
-    # for k, v in question: 
-    #     setattr(db_question, k, v)
-    # db.commit()
-    # db.refresh(db_question)
-    # return db_question
 
 
 
@@ -214,4 +215,31 @@ def get_iraab_answers(db: Session, iraab_answers: list[question_schemas.IraabAns
     db_questions = [db.query(Iraab.id , Iraab.answer).filter(Iraab.id == q.id).first() for q in iraab_answers] 
     return db_questions 
 
-# TODO: get writing feedback
+def get_writing_feedback(answer: str):
+    return multiturn_generate_content(answer)
+
+def multiturn_generate_content(answer):
+  vertexai.init(project=os.environ.get("PROJECT"), location=os.environ.get("LOCATION"))
+  model = GenerativeModel(
+    os.environ.get("GENERATIVE_MODEL"),
+  )
+  chat = model.start_chat(response_validation=False)
+  print(chat.send_message(
+      [f"""{answer}"""],
+      generation_config=generation_config,
+      safety_settings=safety_settings
+  ))
+
+generation_config = {
+    "max_output_tokens": 2048,
+    "temperature": 1,
+    "top_p": 1,
+}
+
+safety_settings = {
+    generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+}
+

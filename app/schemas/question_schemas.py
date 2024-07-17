@@ -103,4 +103,6 @@ class UserAnswers(BaseModel):
 class AnswersRepsonse(BaseModel):
     mcq :list[MCQAnswerResponse]
     iraab:list[IraabAnswerResponse]
-    # writng: WritingAnswerResponse
+    writing: WritingAnswerResponse
+
+    

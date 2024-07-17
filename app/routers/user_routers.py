@@ -13,9 +13,9 @@ from ..schemas.user_schemas import User, UserCreate
 from ..schemas.token_schemas import TokenData
 from .auth_routers import oauth2_scheme
 
-from ..schemas.question_schemas import QuestionResponse, SegmentationResponse, UserAnswers, AnswersRepsonse
+from ..schemas.question_schemas import QuestionResponse, SegmentationResponse, UserAnswers, AnswersRepsonse, WritingAnswerResponse
 
-from ..crud.question_crud import get_questions_not_in_history, get_segmentation, get_iraab_answers, get_mcq_answers
+from ..crud.question_crud import get_questions_not_in_history, get_segmentation, get_iraab_answers, get_mcq_answers, get_writing_feedback
 
 from ..schemas.history_schemas import HistoryCreate
 
@@ -105,7 +105,7 @@ async def read_own_items(
     # check responses   
     mcq_responses = get_mcq_answers(db, answers.mcq)
     iraab_responses = get_iraab_answers(db, answers.iraab)
-    # writing_feedback = get_feedback(answers.writing.user_response)
+    writing_feedback =WritingAnswerResponse(id=answers.writing.id , feedback=get_writing_feedback(answers.writing.user_answer))
 
     # update user history
     for response in mcq_responses:         
@@ -126,8 +126,6 @@ async def read_own_items(
         new_history = HistoryCreate(user_id = current_user.id,  question_id = response.id,  user_answer = user_answer,  feedback = str(feedback), lesson_name=current_user.current_lvl, type='iraab')
         _= create_history(db, new_history)
 
-    # # new_history = HistoryCreate( user_id = current_user.id,  question_id = answers.writing.id,  user_answer = answers.writing.user_response,  feedback = writing_feedback)
-    # # _= create_history(db, new_history)
 
     user_history = get_user_history(db, current_user.id, current_user.current_lvl)
 
@@ -148,7 +146,7 @@ async def read_own_items(
             else:
                 _= move_to_next_lesson(db, current_user.id)
         
-        return {"mcq":mcq_responses, "iraab": iraab_responses } # add writing feedback 
+        return {"mcq":mcq_responses, "iraab": iraab_responses, "writing": writing_feedback }  
 
 
     # analyze user history to decide whether he move to another lesson or practise more    
@@ -168,4 +166,9 @@ async def read_own_items(
         _=move_to_next_lesson(db, current_user.id)
     
 
-    return {"mcq":mcq_responses, "iraab": iraab_responses } # add writing feedback 
+
+
+    return {"mcq":mcq_responses, "iraab": iraab_responses, "writing": writing_feedback }  
+
+
+
